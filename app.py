@@ -124,16 +124,16 @@ def webhookB():
 @app.route('/place-order',methods=['GET','POST'])
 def placeOrder():
    json_data =request.json
-   symbol = "NSE:" + str(json_data["symbol"]) + "-EQ"
-   price =json_data["price"]
-   qty =json_data["qty"]
-   type =json_data["type"]
-   side =json_data["side"]
-   orderinfo = place_orders()
-   orderinfo.setSymbole(symbol)
-   orderinfo.setSymbole(symbol)
-   orderinfo.setSymbole(symbol)
-   return Helper.placeOrders(session['token'],orderinfo.getJsonStructure())
+   # symbol = "NSE:" + str(json_data["symbol"]) + "-EQ"
+   # price =json_data["price"]
+   # qty =json_data["qty"]
+   # type =json_data["type"]
+   # side =json_data["side"]
+   # orderinfo = place_orders()
+   # orderinfo.setSymbole(symbol)
+   # orderinfo.setSymbole(symbol)
+   # orderinfo.setSymbole(symbol)
+   return Helper.placeOrders(session['token'],json_data)
 
 if __name__ == '__main__':
    app.run(host='162.214.94.136',port=5000)
