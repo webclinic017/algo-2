@@ -136,4 +136,4 @@ def placeOrder():
    return Helper.placeOrders(session['token'],json_data)
 
 if __name__ == '__main__':
-   app.run(host='162.214.94.136',port=80)
+   app.run(host='162.214.94.136',port=7000)
