@@ -21,7 +21,7 @@ mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'eageskoo_nse'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'Ashok@2342'
 app.config['MYSQL_DATABASE_DB'] = 'eageskoo_nse'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_HOST'] = '162.214.94.136'
 mysql.init_app(app)
 conn = mysql.connect()
 cursor =conn.cursor()
