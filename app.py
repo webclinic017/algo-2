@@ -133,7 +133,7 @@ def placeOrder():
    # orderinfo.setSymbole(symbol)
    # orderinfo.setSymbole(symbol)
    # orderinfo.setSymbole(symbol)
-   return Helper.placeOrders(session['token'],json_data)
+   return Helper.placeOrders('gAAAAABgRdrv0tVCPbiEMK41C3ZGvMLCbeLwAhu_GWN5cLiTJEg252fN3yx481PhVZ9a-eDGgPk6hY-TPOt0YoQKI9DJcVKN6l7Ueh9Joqhx0S_YhHlIlsk=',json_data)
 
 if __name__ == '__main__':
    app.run()
