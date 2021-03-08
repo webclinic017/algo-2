@@ -43,6 +43,7 @@ def login():
 @app.route('/logout')
 def logout():
    session.pop('token', None)
+   token_generate = ''
    return 'logout'
 
 @app.route('/sbi')
