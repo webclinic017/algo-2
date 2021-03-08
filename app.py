@@ -16,7 +16,7 @@ __token =None
 __fyers_model =None
 app = Flask(__name__)
 app.secret_key = 'asdsssssssaaaa'
-
+token_generate =''
 mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'eageskoo_nse'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'Ashok@2342'
@@ -54,6 +54,7 @@ def getSbiData():
 def loginstatus():
     token = request.args.get('access_token') 
     token = session['token'] = token
+    token_generate = token
     return token
 
 @app.route('/profile',methods=['GET','POST'])
@@ -133,7 +134,7 @@ def placeOrder():
    # orderinfo.setSymbole(symbol)
    # orderinfo.setSymbole(symbol)
    # orderinfo.setSymbole(symbol)
-   return Helper.placeOrders('gAAAAABgRdrv0tVCPbiEMK41C3ZGvMLCbeLwAhu_GWN5cLiTJEg252fN3yx481PhVZ9a-eDGgPk6hY-TPOt0YoQKI9DJcVKN6l7Ueh9Joqhx0S_YhHlIlsk=',json_data)
+   return Helper.placeOrders(token_generate,json_data)
 
 if __name__ == '__main__':
    app.run()
