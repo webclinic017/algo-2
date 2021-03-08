@@ -16,7 +16,7 @@ __token =None
 __fyers_model =None
 app = Flask(__name__)
 app.secret_key = 'asdsssssssaaaa'
-token_generate =''
+
 mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'eageskoo_nse'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'Ashok@2342'
@@ -43,7 +43,9 @@ def login():
 @app.route('/logout')
 def logout():
    session.pop('token', None)
-   token_generate = ''
+   f =open('token.txt','w')
+   a =f.write('')
+   f.close()
    return 'logout'
 
 @app.route('/sbi')
@@ -55,8 +57,10 @@ def getSbiData():
 def loginstatus():
     token = request.args.get('access_token') 
     token = session['token'] = token
-    token_generate = token
-    return token
+    f =open('token.txt','w')
+    a =f.write(token)
+    f.close()
+    return 'success'
 
 @app.route('/profile',methods=['GET','POST'])
 def getProfile(): 
@@ -125,6 +129,8 @@ def webhookB():
 
 @app.route('/place-order',methods=['GET','POST'])
 def placeOrder():
+   f = open("token.txt", "r")
+   token = f.read()
    json_data =request.json
    # symbol = "NSE:" + str(json_data["symbol"]) + "-EQ"
    # price =json_data["price"]
@@ -135,7 +141,7 @@ def placeOrder():
    # orderinfo.setSymbole(symbol)
    # orderinfo.setSymbole(symbol)
    # orderinfo.setSymbole(symbol)
-   return Helper.placeOrders(token_generate,json_data)
+   return Helper.placeOrders(token,json_data)
 
 if __name__ == '__main__':
    app.run()
