@@ -43,9 +43,10 @@ def login():
 @app.route('/logout')
 def logout():
    session.pop('token', None)
-   f =open('token.txt','w')
-   a =f.write('')
-   f.close()
+   sql = " UPDATE config SET token = %s WHERE id = %s"
+   val = ('', 1) 
+   cursor.execute(sql, val)  
+   conn.commit()
    return 'logout'
 
 @app.route('/sbi')
