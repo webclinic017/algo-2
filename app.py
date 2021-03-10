@@ -56,10 +56,11 @@ def getSbiData():
 @app.route('/loginstatus')
 def loginstatus():
     token = request.args.get('access_token') 
-    token = session['token'] = token
-    f =open('token.txt','w')
-    a =f.write(token)
-    f.close()
+    token = session['token'] = token 
+    sql = " UPDATE config SET token = %s WHERE id = %s"
+    val = (token, 1) 
+    cursor.execute(sql, val)  
+    conn.commit()  
     return 'success'
 
 @app.route('/profile',methods=['GET','POST'])
@@ -74,8 +75,10 @@ def getFund():
 
 @app.route('/token',methods=['GET','POST'])
 def getToken():
-   token=open("token.txt", "r").read(); 
-   return token  
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()   
+   token = results[4]
+   return token 
 
 @app.route('/session_token',methods=['GET','POST'])
 def getSessionToken():
@@ -140,8 +143,9 @@ def webhookB():
 
 @app.route('/place-order',methods=['GET','POST'])
 def placeOrder():
-   f = open("token.txt", "r")
-   token = f.read()
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()   
+   token = results[4]  
    json_data =request.json
    # symbol = "NSE:" + str(json_data["symbol"]) + "-EQ"
    # price =json_data["price"]
