@@ -64,7 +64,8 @@ def loginstatus():
 
 @app.route('/profile',methods=['GET','POST'])
 def getProfile(): 
-   return Helper.getProfile(session['token'])
+   token = open("token.txt", "r").read() 
+   return Helper.getProfile(token)
 
 @app.route('/fund',methods=['GET','POST'])
 def getFund():
