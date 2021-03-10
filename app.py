@@ -72,6 +72,16 @@ def getFund():
    token = session['token'] 
    return Helper.getFund(session['token']) 
 
+@app.route('/token',methods=['GET','POST'])
+def getToken():
+   token=open("token.txt", "r").read(); 
+   return token  
+
+@app.route('/session_token',methods=['GET','POST'])
+def getSessionToken():
+   token = session['token'] 
+   return token        
+
 @app.route('/exit',methods=['GET','POST'])
 def exitPositon():
    token = session['token'] 
