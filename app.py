@@ -66,12 +66,16 @@ def loginstatus():
 
 @app.route('/profile',methods=['GET','POST'])
 def getProfile(): 
-   token = open("token.txt", "r").read() 
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()   
+   token = results[4]
    return Helper.getProfile(token)
 
 @app.route('/fund',methods=['GET','POST'])
 def getFund():
-   token = session['token'] 
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()   
+   token = results[4]
    return Helper.getFund(session['token']) 
 
 @app.route('/token',methods=['GET','POST'])
@@ -148,6 +152,11 @@ def placeOrder():
    results = cursor.fetchone()   
    token = results[4]  
    json_data =request.json
+   if json_data['password'] != config.WEBHOOK_PASSWORD:
+      return {
+      "code":"error",
+      "message":"Password Not Match"
+      }
    # symbol = "NSE:" + str(json_data["symbol"]) + "-EQ"
    # price =json_data["price"]
    # qty =json_data["qty"]
@@ -158,6 +167,46 @@ def placeOrder():
    # orderinfo.setSymbole(symbol)
    # orderinfo.setSymbole(symbol)
    return Helper.placeOrders(token,json_data)
+
+@app.route('/place-order-op',methods=['GET','POST'])
+def placeOrderOp(): 
+   json_data =request.json
+   if json_data['password'] != config.WEBHOOK_PASSWORD:
+      return {
+      "code":"error",
+      "message":"Password Not Match"
+      }
+   json_data['password'] ='ad'   
+   return Helper.getStrick() 
+   return Helper.placeOrders(token,json_data)  
+
+
+@app.route('/paper-trade',methods=['post'])      
+def papertrade():
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()  
+   data =json.loads(request.data) 
+   url = results[data['trade_type']]
+   if data['password'] != config.WEBHOOK_PASSWORD:
+      return {
+      "code":"error",
+      "message":"Password Not Match"
+      }
+   price =Helper.getOptinPrice(url)
+   json_data =request.json
+   symbol = str(json_data["symbol"])
+   side =json_data["side"]
+   time =json_data["time"]   
+   qty =json_data["qty"]
+   sql = "INSERT INTO trade_book (qty,side,symbol,price,time) VALUES (%s, %s, %s, %s, %s)"
+   val = (qty, side, symbol, price, time)
+   cursor.execute(sql, val)  
+   conn.commit()  
+   return {
+      "code":200,
+      "data":data,
+      "message":"Success"
+      }    
 
 if __name__ == '__main__':
    app.run()

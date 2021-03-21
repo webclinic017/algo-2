@@ -29,8 +29,14 @@ def getSbiData():
    res = requests.get(url).json()
    data=jsonify(res['d'][0]['v']['lp']) 
    return data.get_data(as_text=True) 
+
 def getBankNiftyData():
    url ='https://data.fyers.in/quotes/V2/?symbols=NSE%3ANIFTY50-INDEX&dataReq=1614828461&marketStat=73798dd18d707d55ff32cfc194400d08&token_id=gAAAAABgPwCY0zgk7eGVKzA8P_NGr-F1ObKlT4iynOoDSjq4EdN-fLIhMV7moVD0fSbGPPdyrMwMZMZsL8bV8xk0aqJJeU5V5dTl90Vt6JZcQdHhS7lhAD0%3D'
+   res = requests.get(url).json()
+   data=jsonify(res['d'][0]['v']['lp']) 
+   return data.get_data(as_text=True)    
+
+def getOptinPrice(url): 
    res = requests.get(url).json()
    data=jsonify(res['d'][0]['v']['lp']) 
    return data.get_data(as_text=True)    
