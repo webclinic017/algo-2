@@ -157,15 +157,7 @@ def placeOrder():
       "code":"error",
       "message":"Password Not Match"
       }
-   # symbol = "NSE:" + str(json_data["symbol"]) + "-EQ"
-   # price =json_data["price"]
-   # qty =json_data["qty"]
-   # type =json_data["type"]
-   # side =json_data["side"]
-   # orderinfo = place_orders()
-   # orderinfo.setSymbole(symbol)
-   # orderinfo.setSymbole(symbol)
-   # orderinfo.setSymbole(symbol)
+   
    return Helper.placeOrders(token,json_data)
 
 @app.route('/place-order-op',methods=['GET','POST'])
