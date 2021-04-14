@@ -11,6 +11,16 @@ import jsonify
 import config
 from flaskext.mysql import MySQL
 import requests
+import pandas_datareader.data as web
+import pandas as pd
+import numpy as np
+import talib
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta 
+from datetime import date 
+import time
+
+from kiteconnect import KiteTicker, KiteConnect
 
 __token =None
 __fyers_model =None
@@ -206,7 +216,68 @@ def papertrade():
       "code":200,
       "data":data,
       "message":"Success"
-      }    
+      }   
 
+@app.route('/indicators',methods=['GET'])      
+def indicators():
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()  
+   start = '2020-04-22'
+   end = '2021-04-22'
+
+   symbol = 'MCD'
+   max_holding = 100
+   price=web.DataReader("F", 'yahoo', start, end) 
+   price = price.iloc[::-1]
+   price = price.dropna()
+   close = price['Low'].values
+   up, mid, low = BBANDS(close, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
+   rsi = talib.RSI(close, timeperiod=14)
+   print("RSI (first 10 elements)\n", rsi[14:24])
+   
+   return 'sc'    
+@app.route('/get-data',methods=['GET'])      
+def getdata():
+   userid=''
+   timeframe='minute'
+   auth_token='enctoken d6vMDOm5PwfpI9HOq8MNsOjvWxFExZs7/BiodiHlQbU8+/mskJhqaWLadToc3m1I4R/9JYH/OfxuJLMy04MwZ0ss6GHZcw=='
+   ciqrandom='1617468866644'
+   headers={'Authorization':auth_token}
+   from_date =''
+   from_date =date(2020,4,10)
+   to_date =date(2020,4,9)
+   url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=5&from=1617247136&to=1618111196&token_id=gAAAAABgcmnTQYrjcl4lqUoBi5mJ6mfhF_liBN3Qhb06aUeZtecLB3X9oY7gmtWzaQtZ20Ymxp6WgSWUs_p6fU8TysA1nKA69ukE-w3dmfX4nWLRWk-TjS8%3D&contFlag=1&marketStat=b277274b135cabca5e6fa54f64ed0881&dataReq=1618111136'
+   resjson = requests.get(url,headers=headers).json() 
+   candleinfo = resjson['candles']
+   columns = ['timestamp','Open','High','Low','Close','OI']
+   df = pd.DataFrame(candleinfo, columns=columns)
+   Open =df['Open']
+   High =df['High']
+   Low =df['Low']
+   Close =df['Close'].values
+   timestamp =df['timestamp'] 
+   date_time=[]
+   for times in timestamp:
+      date_time = datetime.fromtimestamp(times) 
+
+   sma9 = talib.SMA(Close,9)
+   sma21 = talib.SMA(Close,21)
+   rsi = talib.SMA(Close,9)
+   macd = talib.MACD(Close, fastperiod=12, slowperiod=26, signalperiod=9)
+   value = (Open + High + Low + Close)/4
+    
+   while True:    
+   if (datetime.now().secound==0) and (datetime.now().minute % 5 == 0):
+      if (sma9[-9] < sma21[-9]) and (sma9[-8] > sma21[-8]):
+         print('BUy') 
+         
+   if (datetime.now().secound==0) and (datetime.now().minute % 5 == 0):
+      if (sma9[-9] < sma21[-9]) and (sma9[-8] > sma21[-8]):
+         print('Sell')
+            
+     
+   print("RSI (first 10 elements)\n", date_time) 
+   print(date_time)
+   return render_template('tradingview.html', resjson=candleinfo)
 if __name__ == '__main__':
-   app.run(debug=False)
+   app.run(debug=True)

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <h1>View</h1>
+        {% for df in resjson: %}
+        <li>{{ doSomething('Test') }}</li>
+	    {% endfor %}
+        </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>        
+<script src="
+https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>    
+<script>
+    const chart = LightweightCharts.createChart(document.body, { width: 400, height: 300 });
+const lineSeries = chart.addLineSeries();
+lineSeries.setData([
+{% for df in resjson %}
+{ time:'{{df[0].strftime}}', value: '{{ df[1] }}' },
+{% endfor %}
+    
+  
+]);
+ 
+ 
+</script>    
+</body>
+</html>
+ 

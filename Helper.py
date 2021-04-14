@@ -31,7 +31,7 @@ def getSbiData():
    return data.get_data(as_text=True) 
 
 def getBankNiftyData():
-   url ='https://data.fyers.in/quotes/V2/?symbols=NSE%3ANIFTY50-INDEX&dataReq=1614828461&marketStat=73798dd18d707d55ff32cfc194400d08&token_id=gAAAAABgPwCY0zgk7eGVKzA8P_NGr-F1ObKlT4iynOoDSjq4EdN-fLIhMV7moVD0fSbGPPdyrMwMZMZsL8bV8xk0aqJJeU5V5dTl90Vt6JZcQdHhS7lhAD0%3D'
+   url ='https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=5&from=1617247136&to=1618111196&token_id=gAAAAABgcmnTQYrjcl4lqUoBi5mJ6mfhF_liBN3Qhb06aUeZtecLB3X9oY7gmtWzaQtZ20Ymxp6WgSWUs_p6fU8TysA1nKA69ukE-w3dmfX4nWLRWk-TjS8%3D&contFlag=1&marketStat=b277274b135cabca5e6fa54f64ed0881&dataReq=1618111136'
    res = requests.get(url).json()
    data=jsonify(res['d'][0]['v']['lp']) 
    return data.get_data(as_text=True)    
