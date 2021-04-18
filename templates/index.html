@@ -7,9 +7,13 @@
     <title>Document</title>
 </head>
 <body>
-    <div>
-        {% for member in results: %}
-        <li>{{ member }}</li>
+    <div> 
+        {% set indicate = 0 %}
+        {% for value in results: %}
+         
+        <li>{{  ((value[1]+value[2]+value[3]+value[4])/4) - value[1]  }} {{value[1]}}</li>
+           
+            
 	        {% endfor %}
         </div>
 </body>

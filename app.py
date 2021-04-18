@@ -252,7 +252,28 @@ def indicators():
    rsi = talib.RSI(close, timeperiod=14)
    print("RSI (first 10 elements)\n", rsi[14:24])
    
-   return 'sc'    
+   return 'sc'
+@app.route('/backtesting',methods=['GET'])      
+def backtesting():
+   url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1618501077&to=1618730097&token_id=gAAAAABge9ueWLukHldUqUSlKaXnx-BjTlI_0k0Pi3_ebRv7au76WeXiKGRb8yvDFyBgFVPAE75-chnNCja34pVF6iicd2Sm_XWMY-N65ZijkOtR1MO2MXs%3D&contFlag=1&marketStat=a295737d89f6b54a967ab7874abe356b&dataReq=1618730038'
+   resjson = requests.get(url).json() 
+   candleinfo = resjson['candles']
+   columns = ['timestamp','Open','High','Low','Close','OI']
+   df = pd.DataFrame(candleinfo, columns=columns)
+   df.reset_index()
+   Open =df['Open']
+   High =df['High']
+   Low =df['Low']
+   Close =df['Close'].values 
+   sma9 = talib.SMA(Close,9)
+   sma21 = talib.SMA(Close,21)
+   rsi = talib.SMA(Close,9)
+   macd, macdsignal, macdhist = talib.MACD(Close, fastperiod=12, slowperiod=26, signalperiod=9) 
+   print(macdhist[-2])
+   macdhist = macdhist[~np.isnan(macdhist)]
+   return render_template('index.html', results=candleinfo)
+   
+   return 'macd'          
 # interval example
 @scheduler.task('cron', id='do_job_1', minute='*', misfire_grace_time=900)
 def scheduledTask():
@@ -264,8 +285,8 @@ def scheduledTask():
    from_date =''
    from_date =date(2020,4,10)
    to_date =date(2020,4,9)
-   url = 'https://data.fyers.in/history/V7/?symbol=MCX%3ASILVERMIC21APRFUT&resolution=1&from=1618308883&to=1618481743&token_id=gAAAAABgeBF5N1aDANnLhoL_ULLfxlFb99bXGNOiTmzr_lNJgcesHvNriWFW4tLRDFrhQEOmnreb58pwuwZCf_-jQdwgJOa7SWOnNZ-DrSmU44XYVrUJF5U%3D&contFlag=1&marketStat=6f6455edd7507393528fb3018ca96b79&dataReq=1618481683'
-   resjson = requests.get(url,headers=headers).json() 
+   url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1618501077&to=1618730097&token_id=gAAAAABge9ueWLukHldUqUSlKaXnx-BjTlI_0k0Pi3_ebRv7au76WeXiKGRb8yvDFyBgFVPAE75-chnNCja34pVF6iicd2Sm_XWMY-N65ZijkOtR1MO2MXs%3D&contFlag=1&marketStat=a295737d89f6b54a967ab7874abe356b&dataReq=1618730038'
+   resjson = requests.get(url).json() 
    candleinfo = resjson['candles']
    columns = ['timestamp','Open','High','Low','Close','OI']
    df = pd.DataFrame(candleinfo, columns=columns)
@@ -278,7 +299,7 @@ def scheduledTask():
    rsi = talib.SMA(Close,9)
    macd = talib.MACD(Close, fastperiod=12, slowperiod=26, signalperiod=9)
    value = (Open + High + Low + Close)/4
-   print(app.debug)
+   print('check')
    if (sma9[-2] < sma21[-2]) and (sma9[-1] > sma21[-1]):
       print('BUy') 
    if (sma9[-2] > sma21[-2]) and (sma9[-1] < sma21[-1]):
@@ -288,4 +309,5 @@ if __name__ == '__main__':
    if not app.debug == 'true': 
       scheduler.add_job(id ='Scheduled task', func = scheduledTask, trigger = 'cron', minute = 1)
       scheduler.start() 
-      app.run(use_reloader=False)
+      app.run(debug=False,use_reloader=False)
+      # app.run(debug=True)
