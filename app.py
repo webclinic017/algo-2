@@ -17,7 +17,6 @@ import pandas_datareader.data as web
 import pandas as pd
 import pandas_ta as ta
 import numpy as np
-import matplotlib.pyplot as plt
 from datetime import datetime, timedelta 
 from datetime import date 
 import time
