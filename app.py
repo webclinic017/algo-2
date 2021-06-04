@@ -15,8 +15,8 @@ from flaskext.mysql import MySQL
 import requests
 import pandas_datareader.data as web
 import pandas as pd
+import pandas_ta as ta
 import numpy as np
-import talib
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta 
 from datetime import date 
@@ -235,6 +235,14 @@ def papertrade():
       "message":"Success"
       }   
 
+def storetrade(qty,side,symbol,price,time,indicator):
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()  
+   sql = "INSERT INTO trade_book (qty,side,symbol,price,time,indicator) VALUES (%s, %s, %s, %s, %s, %s)"
+   val = (qty, side, symbol, price, time,indicator)
+   cursor.execute(sql, val)  
+   conn.commit()  
+
 @app.route('/indicators',methods=['GET'])      
 def indicators():
    cursor.execute("SELECT * from config")
@@ -243,35 +251,38 @@ def indicators():
    end = '2021-04-22'
 
    symbol = 'MCD'
-   max_holding = 100
-   price=web.DataReader("F", 'yahoo', start, end) 
-   price = price.iloc[::-1]
-   price = price.dropna()
-   close = price['Low'].values
-   up, mid, low = BBANDS(close, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
-   rsi = talib.RSI(close, timeperiod=14)
-   print("RSI (first 10 elements)\n", rsi[14:24])
+   # max_holding = 100
+   # price=web.DataReader("F", 'yahoo', start, end) 
+   # price = price.iloc[::-1]
+   # price = price.dropna()
+   # close = price['Low'].values
+   # up, mid, low = BBANDS(close, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
+   # rsi = talib.RSI(close, timeperiod=14)
+   # print("RSI (first 10 elements)\n", rsi[14:24])
    
    return 'sc'
 @app.route('/backtesting',methods=['GET'])      
 def backtesting():
-   url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1618501077&to=1618730097&token_id=gAAAAABge9ueWLukHldUqUSlKaXnx-BjTlI_0k0Pi3_ebRv7au76WeXiKGRb8yvDFyBgFVPAE75-chnNCja34pVF6iicd2Sm_XWMY-N65ZijkOtR1MO2MXs%3D&contFlag=1&marketStat=a295737d89f6b54a967ab7874abe356b&dataReq=1618730038'
-   resjson = requests.get(url).json() 
-   candleinfo = resjson['candles']
-   columns = ['timestamp','Open','High','Low','Close','OI']
-   df = pd.DataFrame(candleinfo, columns=columns)
-   df.reset_index()
-   Open =df['Open']
-   High =df['High']
-   Low =df['Low']
-   Close =df['Close'].values 
-   sma9 = talib.SMA(Close,9)
-   sma21 = talib.SMA(Close,21)
-   rsi = talib.SMA(Close,9)
-   macd, macdsignal, macdhist = talib.MACD(Close, fastperiod=12, slowperiod=26, signalperiod=9) 
-   print(macdhist[-2])
-   macdhist = macdhist[~np.isnan(macdhist)]
-   return render_template('index.html', results=candleinfo)
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()   
+   url = results[8]
+   # url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1618501077&to=1618730097&token_id=gAAAAABge9ueWLukHldUqUSlKaXnx-BjTlI_0k0Pi3_ebRv7au76WeXiKGRb8yvDFyBgFVPAE75-chnNCja34pVF6iicd2Sm_XWMY-N65ZijkOtR1MO2MXs%3D&contFlag=1&marketStat=a295737d89f6b54a967ab7874abe356b&dataReq=1618730038'
+   # resjson = requests.get(url).json() 
+   # candleinfo = resjson['candles']
+   # columns = ['timestamp','Open','High','Low','Close','OI']
+   # df = pd.DataFrame(candleinfo, columns=columns)
+   # df.reset_index()
+   # Open =df['Open']
+   # High =df['High']
+   # Low =df['Low']
+   # Close =df['Close'].values 
+   # sma9 = talib.SMA(Close,9)
+   # sma21 = talib.SMA(Close,21)
+   # rsi = talib.SMA(Close,9)
+   # macd, macdsignal, macdhist = talib.MACD(Close, fastperiod=12, slowperiod=26, signalperiod=9) 
+   # print(macdhist[-2])
+   # macdhist = macdhist[~np.isnan(macdhist)]
+   # return render_template('index.html', results=candleinfo)
    
    return 'macd'          
 # interval example
@@ -285,7 +296,10 @@ def scheduledTask():
    from_date =''
    from_date =date(2020,4,10)
    to_date =date(2020,4,9)
-   url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1618501077&to=1618730097&token_id=gAAAAABge9ueWLukHldUqUSlKaXnx-BjTlI_0k0Pi3_ebRv7au76WeXiKGRb8yvDFyBgFVPAE75-chnNCja34pVF6iicd2Sm_XWMY-N65ZijkOtR1MO2MXs%3D&contFlag=1&marketStat=a295737d89f6b54a967ab7874abe356b&dataReq=1618730038'
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()   
+   url = results[8]
+   # url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1620561415&to=1620790435&token_id=gAAAAABgm0w-XnrWX52NA-h4wMaK6YIxWE25nhMIqpOHjmBVyaiMjh0qIAABt0Z7x_iT0_h8SBgpUTb_qFQX9flwWap_ZvWhrqwpIQ0ma-obBr7UqGOeVqM%3D&contFlag=1&marketStat=75946787eb1b0c34d9effd84d9a48ff3&dataReq=1620790375'
    resjson = requests.get(url).json() 
    candleinfo = resjson['candles']
    columns = ['timestamp','Open','High','Low','Close','OI']
@@ -294,20 +308,44 @@ def scheduledTask():
    High =df['High']
    Low =df['Low']
    Close =df['Close'].values 
-   sma9 = talib.SMA(Close,9)
-   sma21 = talib.SMA(Close,21)
-   rsi = talib.SMA(Close,9)
-   macd = talib.MACD(Close, fastperiod=12, slowperiod=26, signalperiod=9)
-   value = (Open + High + Low + Close)/4
-   print('check')
-   if (sma9[-2] < sma21[-2]) and (sma9[-1] > sma21[-1]):
-      print('BUy') 
-   if (sma9[-2] > sma21[-2]) and (sma9[-1] < sma21[-1]):
-      print('Sell')  
+   sma9 = ta.sma(df["Close"], length=9)
+   sma21 = ta.sma(df["Close"], length=21) 
+   # value = (Open + High + Low + Close)/4
+   print('check')  
+   if (sma9.iloc[-2] < sma21.iloc[-2]) and (sma9.iloc[-1] > sma21.iloc[-1]):
+      print('BUy')
+      storetrade(75,1,'nifty',Close.tail(1),1,'sma921') 
+   if (sma9.iloc[-2] > sma21.iloc[-2]) and (sma9.iloc[-1] < sma21.iloc[-1]):
+      print('Sell') 
+      storetrade(75,-1,'nifty',Close[-1],1,'sma921') 
+
+@app.route('/pandasta',methods=['GET'])      
+def pandasta():
+   cursor.execute("SELECT * from config")
+   results = cursor.fetchone()   
+   url = results[8]
+   # url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1620561415&to=1620790435&token_id=gAAAAABgm0w-XnrWX52NA-h4wMaK6YIxWE25nhMIqpOHjmBVyaiMjh0qIAABt0Z7x_iT0_h8SBgpUTb_qFQX9flwWap_ZvWhrqwpIQ0ma-obBr7UqGOeVqM%3D&contFlag=1&marketStat=75946787eb1b0c34d9effd84d9a48ff3&dataReq=1620790375'
+   resjson = requests.get(url).json() 
+   candleinfo = resjson['candles']
+   columns = ['timestamp','Open','High','Low','Close','OI']
+   df = pd.DataFrame(candleinfo, columns=columns)
+   df.reset_index()
+   Open =df['Open']
+   High =df['High']
+   Low =df['Low']
+   Close =df['Close'].values  
+   sma9 = ta.sma(df["Close"], length=9)
+   sma21 = ta.sma(df["Close"], length=21)
+   print(Close[-1])  
+   # print(macdhist[-2])
+   # macdhist = macdhist[~np.isnan(macdhist)]
+   # return render_template('index.html', results=candleinfo)
+   
+   return 'macd'        
 
 if __name__ == '__main__': 
    if not app.debug == 'true': 
-      scheduler.add_job(id ='Scheduled task', func = scheduledTask, trigger = 'cron', minute = 1)
+      scheduler.add_job(id ='Scheduled task', func = scheduledTask, trigger = 'cron', minute = 1,misfire_grace_time=90000)
       scheduler.start() 
       app.run(debug=False,use_reloader=False)
       # app.run(debug=True)
