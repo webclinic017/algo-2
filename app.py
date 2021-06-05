@@ -6,17 +6,13 @@ from fyers_api import fyersModel
 from orders_model import place_orders
 from fyers_model import Fyers_model
 from flask import request
-import sys
-import os
 import json
-import jsonify
 import config
 from flaskext.mysql import MySQL
 import requests
 import pandas_datareader.data as web
 import pandas as pd
-import pandas_ta as ta
-import numpy as np
+import pandas_ta as ta 
 from datetime import datetime, timedelta 
 from datetime import date 
 import time
