@@ -9,7 +9,6 @@ import json
 import config
 from flaskext.mysql import MySQL
 import requests
-import pandas_datareader.data as web
 import pandas as pd
 import pandas_ta as ta 
 from datetime import datetime, timedelta 
