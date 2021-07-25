@@ -1,5 +1,4 @@
-from flask import Flask,Response,render_template,session
-from flask_apscheduler import APScheduler
+from flask import Flask,Response,render_template,session 
 import fyers_login
 import Helper
 from fyers_api import fyersModel
@@ -14,7 +13,7 @@ import pandas_datareader.data as web
 import pandas as pd
 import pandas_ta as ta 
 from datetime import datetime, timedelta 
-from datetime import date 
+from datetime import date
 import time
 
 from kiteconnect import KiteTicker, KiteConnect
@@ -27,8 +26,7 @@ class Config:
     
 app = Flask(__name__)
 app.config.from_object(Config())
-# initialize scheduler
-scheduler = APScheduler()
+# initialize scheduler 
 # if you don't wanna use a config, you can set options here:
 # scheduler.api_enabled = True
 # scheduler.init_app(app)
@@ -49,8 +47,8 @@ conn = mysql.connect()
 cursor =conn.cursor()
 
 @app.route('/')
-def home(): 
-   return 'welcome'
+def home():  
+      return 'welcome'
 
 @app.route('/data')
 def data(): 
@@ -279,40 +277,7 @@ def backtesting():
    # macdhist = macdhist[~np.isnan(macdhist)]
    # return render_template('index.html', results=candleinfo)
    
-   return 'macd'          
-# interval example
-@scheduler.task('cron', id='do_job_1', minute='*', misfire_grace_time=900)
-def scheduledTask():
-   userid=''
-   timeframe='minute'
-   auth_token='enctoken d6vMDOm5PwfpI9HOq8MNsOjvWxFExZs7/BiodiHlQbU8+/mskJhqaWLadToc3m1I4R/9JYH/OfxuJLMy04MwZ0ss6GHZcw=='
-   ciqrandom='1617468866644'
-   headers={'Authorization':auth_token}
-   from_date =''
-   from_date =date(2020,4,10)
-   to_date =date(2020,4,9)
-   cursor.execute("SELECT * from config")
-   results = cursor.fetchone()   
-   url = results[8]
-   # url = 'https://data.fyers.in/history/V7/?symbol=NSE%3ANIFTY50-INDEX&resolution=1&from=1620561415&to=1620790435&token_id=gAAAAABgm0w-XnrWX52NA-h4wMaK6YIxWE25nhMIqpOHjmBVyaiMjh0qIAABt0Z7x_iT0_h8SBgpUTb_qFQX9flwWap_ZvWhrqwpIQ0ma-obBr7UqGOeVqM%3D&contFlag=1&marketStat=75946787eb1b0c34d9effd84d9a48ff3&dataReq=1620790375'
-   resjson = requests.get(url).json() 
-   candleinfo = resjson['candles']
-   columns = ['timestamp','Open','High','Low','Close','OI']
-   df = pd.DataFrame(candleinfo, columns=columns)
-   Open =df['Open']
-   High =df['High']
-   Low =df['Low']
-   Close =df['Close'].values 
-   sma9 = ta.sma(df["Close"], length=9)
-   sma21 = ta.sma(df["Close"], length=21) 
-   # value = (Open + High + Low + Close)/4
-   print('check')  
-   if (sma9.iloc[-2] < sma21.iloc[-2]) and (sma9.iloc[-1] > sma21.iloc[-1]):
-      print('BUy')
-      storetrade(75,1,'nifty',Close.tail(1),1,'sma921') 
-   if (sma9.iloc[-2] > sma21.iloc[-2]) and (sma9.iloc[-1] < sma21.iloc[-1]):
-      print('Sell') 
-      storetrade(75,-1,'nifty',Close[-1],1,'sma921') 
+   return 'macd'   
 
 @app.route('/pandasta',methods=['GET'])      
 def pandasta():
@@ -336,11 +301,37 @@ def pandasta():
    # macdhist = macdhist[~np.isnan(macdhist)]
    # return render_template('index.html', results=candleinfo)
    
-   return 'macd'        
+   return 'macd'  
 
+def task():    
+   for i in range(100):
+      print('check')
+      cursor.execute("SELECT * from config")
+      results = cursor.fetchone()   
+      url = results[8]
+      resjson = requests.get(url).json() 
+      if(resjson['s']!='error'): 
+         candleinfo = resjson['candles']
+         columns = ['timestamp','Open','High','Low','Close','OI']
+         df = pd.DataFrame(candleinfo, columns=columns)
+         Open =df['Open']
+         High =df['High']
+         Low =df['Low']
+         Close =df['Close'].values 
+         sma9 = ta.sma(df["Close"], length=9)
+         sma21 = ta.sma(df["Close"], length=21) 
+         value = (Open + High + Low + Close)/4
+         # print(sma9.iloc[-2])  
+         # print(sma21.iloc[-2])  
+         if (sma9.iloc[-2] < sma21.iloc[-2]) and (sma9.iloc[-9] > sma21.iloc[-9]):
+            print('BUy')
+            storetrade(75,1,'nifty',Close.tail(1),1,'sma921') 
+         if (sma9.iloc[-2] > sma21.iloc[-2]) and (sma9.iloc[-9] < sma21.iloc[-9]):
+            print('Sell') 
+            storetrade(75,-1,'nifty',Close[-1],1,'sma921') 
+      time.sleep(60)
 if __name__ == '__main__': 
    if not app.debug == 'true': 
-      scheduler.add_job(id ='Scheduled task', func = scheduledTask, trigger = 'cron', minute = 1,misfire_grace_time=90000)
-      scheduler.start() 
+      task()
       app.run(debug=False,use_reloader=False)
-      # app.run(debug=True)
+      # app.run(debug=True,use_reloader=True)
